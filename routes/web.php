@@ -15,6 +15,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// ユーザ登録　非authのguest状態
+// ユーザ登録 $this->middleware('guest');つまり、signup表示はguestのみ
 Route::get('signup', 'Auth\RegisterController@showRegistrationForm')->name('signup.get');
 Route::post('signup', 'Auth\RegisterController@register')->name('signup.post');
+
+// 認証  $this->middleware('guest')->except('logout');つまり、login表示はguestのみ。logout表示はauthのみ
+Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
+Route::post('login', 'Auth\LoginController@login')->name('login.post');
+Route::get('logout', 'Auth\LoginController@logout')->name('logout.get');
