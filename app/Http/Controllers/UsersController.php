@@ -24,13 +24,21 @@ class UsersController extends Controller
     public function show($id)
     {   
         //model
-        // idの値でユーザを検索して取得
+        
+        //ユーザーidで取得
         $user = User::findOrFail($id);
 
+        //投稿数カウント
+        $user->loadRelationshipCounts();
+
+        // ユーザの投稿一覧を作成日時の降順で取得
+        $microposts = $user->microposts()->orderBy('created_at', 'desc')->paginate(10);
+        
         //view
         // ユーザ詳細ビューでそれを表示
         return view('users.show', [
-            'user' => $user,
+            'user'       => $user,
+            'microposts' => $microposts
         ]);
     }
 }

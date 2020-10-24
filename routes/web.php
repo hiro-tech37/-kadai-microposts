@@ -11,9 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'MicropostsController@index');
 
 // ユーザ登録 $this->middleware('guest');つまり、signup表示はguestのみ
 Route::get('signup', 'Auth\RegisterController@showRegistrationForm')->name('signup.get');
@@ -24,7 +22,12 @@ Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login')->name('login.post');
 Route::get('logout', 'Auth\LoginController@logout')->name('logout.get');
 
-//authユーザーのみアクセス可。ユーザー@index@show
+//authユーザーのみアクセス可。
 Route::group(['middleware' => ['auth']], function () {
+    
+    //ユーザー@index@show
     Route::resource('users', 'UsersController', ['only' => ['index', 'show']]);
+    //マイクロポスト@store@destroy
+    Route::resource('microposts', 'MicropostsController', ['only' => ['store', 'destroy']]);
+    
 });
