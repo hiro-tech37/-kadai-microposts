@@ -12,7 +12,7 @@ class UsersController extends Controller
     {   
         //モデルへアクセス
         // ユーザ一覧をidの降順で取得
-        $users = User::orderBy('id', 'desc')->paginate(1);
+        $users = User::orderBy('id', 'desc')->paginate(10);
 
         //viewへアクセス
         // ユーザ一覧ビューでそれを表示
