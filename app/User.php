@@ -105,6 +105,18 @@ class User extends Authenticatable
         return $this->followings()->where('follow_id', $userId)->exists();
     }
 
+
+    //「feed＝外部から刻々と配信されてくるデータを時系列で一覧に。」
+    //followings()と自分のidを引っ張ってくる
+    public function feed_microposts()
+    {
+        // このユーザがフォロー中のユーザのidを取得して配列にする。「pluck=摘む」
+        $userIds = $this->followings()->pluck('users.id')->toArray();
+        // このユーザのidもその配列に追加
+        $userIds[] = $this->id;
+        // それらのユーザが所有する投稿に絞り込む
+        return Micropost::whereIn('user_id', $userIds);
+    }
     
     
     //hasManyなmicropostsの数カウントするメソッド
