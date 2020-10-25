@@ -14,13 +14,7 @@ class UserFollowController extends Controller
         return back();
     }
 
-    /**
-     * ユーザをアンフォローするアクション。
-     *
-     * @param  $id  相手ユーザのid
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+     public function destroy($id)
     {
         // 認証済みユーザ（閲覧者）が、 idのユーザをアンフォローする
         \Auth::user()->unfollow($id);

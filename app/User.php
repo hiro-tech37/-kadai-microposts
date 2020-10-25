@@ -47,7 +47,7 @@ class User extends Authenticatable
     //User同士のbelonbsToMany関係をメソッド化。フォローしてるorされている
     public function followings()
     {
-        //belongsToMany() では、第一引数に得られるModelクラス（User::class) を指定し、
+        //belongsToMany() では、第一引数に相手Modelクラス（User::class) を指定し、
                                 //第二引数に中間テーブル（user_follow）を指定し
                                 //第三引数には中間テーブルに保存されている自分のidを示すカラム名（user_id）を指定し
                                 //第四引数には中間テーブルに保存されている関係先のidを示すカラム名（follow_id）を指定
@@ -106,6 +106,57 @@ class User extends Authenticatable
     }
 
 
+    
+    //お気に入り機能
+    //belongsToMany関係をメソッド化
+    public function favorites()
+    {
+        return $this->belongsToMany(Micropost::class, 'favorites', 'user_id', 'micropost_id')->withTimestamps();
+    }
+    
+    //お気に入り（favo）をメソッド化
+    
+    public function favo($micropostId)
+    {
+        $favo_exist = $this->is_favoriting($micropostId);
+        
+        if($favo_exist){
+            return false;
+        }else{
+            $this->favorites()->attach($micropostId);
+            return true;
+        }
+    }
+
+    
+    public function unfavo($micropostId)
+    {
+        $favo_exist = $this->is_favoriting($micropostId);
+
+        if ($favo_exist) {
+            $this->favorites()->detach($micropostId);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //すでにお気に入りに入っているか確認
+    public function is_favoriting($micropostId)
+    {
+        // フォロー中ユーザの中に $userIdのものが存在するか
+        return $this->favorites()->where('micropost_id', $micropostId)->exists();
+    }
+    
+    
+    
+    //対多な数をカウントするメソッド
+    public function loadRelationshipCounts()
+    {
+        $this->loadCount(['microposts', 'followings', 'followers','favorites']);
+    }
+
+
     //「feed＝外部から刻々と配信されてくるデータを時系列で一覧に。」
     //followings()と自分のidを引っ張ってくる
     public function feed_microposts()
@@ -116,13 +167,6 @@ class User extends Authenticatable
         $userIds[] = $this->id;
         // それらのユーザが所有する投稿に絞り込む
         return Micropost::whereIn('user_id', $userIds);
-    }
-    
-    
-    //hasManyなmicropostsの数カウントするメソッド
-    public function loadRelationshipCounts()
-    {
-        $this->loadCount(['microposts', 'followings', 'followers']);
     }
     
     
